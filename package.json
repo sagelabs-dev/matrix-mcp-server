@@ -6,7 +6,8 @@
   "main": "src/index.js",
   "exports": {
     ".": "./src/index.js",
-    "./mcp-server.js": "./src/mcp-server.js"
+    "./mcp-server.js": "./src/mcp-server.js",
+    "./package.json": "./package.json"
   },
   "engines": {
     "node": ">=22.0.0"
