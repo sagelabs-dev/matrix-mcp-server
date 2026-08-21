@@ -63,10 +63,19 @@ describe('createMatrixMcpServer', () => {
       const { server } = createTestServer()
       // Access internal tools via the test export
       const { getTools } = await import('../../src/mcp-server.js')
-      const tools = getTools(matrixClient, { aliasStore, mcpDataStore, resolver, homeserverUrl: 'https://matrix.org', serverName: 'matrix.org' })
-      const sendMsg = tools.find(t => t.name === 'send_message')
+      const tools = getTools(matrixClient, {
+        aliasStore,
+        mcpDataStore,
+        resolver,
+        homeserverUrl: 'https://matrix.org',
+        serverName: 'matrix.org',
+      })
+      const sendMsg = tools.find((t) => t.name === 'send_message')
 
-      const result = await sendMsg.execute({ roomId: '!room1:matrix.org', message: 'Hello world' }, { userId: '@user:matrix.org' })
+      const result = await sendMsg.execute(
+        { roomId: '!room1:matrix.org', message: 'Hello world' },
+        { userId: '@user:matrix.org' }
+      )
       const parsed = JSON.parse(result.content[0].text)
       expect(parsed.success).toBe(true)
       expect(parsed.roomId).toBe('!room1:matrix.org')
@@ -74,10 +83,19 @@ describe('createMatrixMcpServer', () => {
 
     it('send_message resolves room by name', async () => {
       const { getTools } = await import('../../src/mcp-server.js')
-      const tools = getTools(matrixClient, { aliasStore, mcpDataStore, resolver, homeserverUrl: 'https://matrix.org', serverName: 'matrix.org' })
-      const sendMsg = tools.find(t => t.name === 'send_message')
+      const tools = getTools(matrixClient, {
+        aliasStore,
+        mcpDataStore,
+        resolver,
+        homeserverUrl: 'https://matrix.org',
+        serverName: 'matrix.org',
+      })
+      const sendMsg = tools.find((t) => t.name === 'send_message')
 
-      const result = await sendMsg.execute({ roomName: 'Engineering', message: 'Hello' }, { userId: '@user:matrix.org' })
+      const result = await sendMsg.execute(
+        { roomName: 'Engineering', message: 'Hello' },
+        { userId: '@user:matrix.org' }
+      )
       const parsed = JSON.parse(result.content[0].text)
       expect(parsed.success).toBe(true)
       expect(parsed.roomId).toBe('!room1:matrix.org')
@@ -86,8 +104,14 @@ describe('createMatrixMcpServer', () => {
 
     it('send_message returns error for missing roomId and roomName', async () => {
       const { getTools } = await import('../../src/mcp-server.js')
-      const tools = getTools(matrixClient, { aliasStore, mcpDataStore, resolver, homeserverUrl: 'https://matrix.org', serverName: 'matrix.org' })
-      const sendMsg = tools.find(t => t.name === 'send_message')
+      const tools = getTools(matrixClient, {
+        aliasStore,
+        mcpDataStore,
+        resolver,
+        homeserverUrl: 'https://matrix.org',
+        serverName: 'matrix.org',
+      })
+      const sendMsg = tools.find((t) => t.name === 'send_message')
 
       const result = await sendMsg.execute({ message: 'Hello' }, { userId: '@user:matrix.org' })
       expect(result.isError).toBe(true)
@@ -98,8 +122,14 @@ describe('createMatrixMcpServer', () => {
 
     it('join_room tool joins a room', async () => {
       const { getTools } = await import('../../src/mcp-server.js')
-      const tools = getTools(matrixClient, { aliasStore, mcpDataStore, resolver, homeserverUrl: 'https://matrix.org', serverName: 'matrix.org' })
-      const joinTool = tools.find(t => t.name === 'join_room')
+      const tools = getTools(matrixClient, {
+        aliasStore,
+        mcpDataStore,
+        resolver,
+        homeserverUrl: 'https://matrix.org',
+        serverName: 'matrix.org',
+      })
+      const joinTool = tools.find((t) => t.name === 'join_room')
 
       const result = await joinTool.execute({ roomIdOrAlias: '#engineering:matrix.org' }, {})
       const parsed = JSON.parse(result.content[0].text)
@@ -109,8 +139,14 @@ describe('createMatrixMcpServer', () => {
 
     it('get_joined_rooms returns room list', async () => {
       const { getTools } = await import('../../src/mcp-server.js')
-      const tools = getTools(matrixClient, { aliasStore, mcpDataStore, resolver, homeserverUrl: 'https://matrix.org', serverName: 'matrix.org' })
-      const getRooms = tools.find(t => t.name === 'get_joined_rooms')
+      const tools = getTools(matrixClient, {
+        aliasStore,
+        mcpDataStore,
+        resolver,
+        homeserverUrl: 'https://matrix.org',
+        serverName: 'matrix.org',
+      })
+      const getRooms = tools.find((t) => t.name === 'get_joined_rooms')
 
       const result = await getRooms.execute({}, {})
       const parsed = JSON.parse(result.content[0].text)
@@ -120,10 +156,19 @@ describe('createMatrixMcpServer', () => {
 
     it('get_room_messages returns messages', async () => {
       const { getTools } = await import('../../src/mcp-server.js')
-      const tools = getTools(matrixClient, { aliasStore, mcpDataStore, resolver, homeserverUrl: 'https://matrix.org', serverName: 'matrix.org' })
-      const getMsgs = tools.find(t => t.name === 'get_room_messages')
+      const tools = getTools(matrixClient, {
+        aliasStore,
+        mcpDataStore,
+        resolver,
+        homeserverUrl: 'https://matrix.org',
+        serverName: 'matrix.org',
+      })
+      const getMsgs = tools.find((t) => t.name === 'get_room_messages')
 
-      const result = await getMsgs.execute({ roomId: '!room1:matrix.org', limit: 10 }, { userId: '@user:matrix.org' })
+      const result = await getMsgs.execute(
+        { roomId: '!room1:matrix.org', limit: 10 },
+        { userId: '@user:matrix.org' }
+      )
       const parsed = JSON.parse(result.content[0].text)
       expect(parsed.success).toBe(true)
       expect(parsed.messages).toHaveLength(2)
@@ -131,10 +176,19 @@ describe('createMatrixMcpServer', () => {
 
     it('send_dm creates a DM if none exists', async () => {
       const { getTools } = await import('../../src/mcp-server.js')
-      const tools = getTools(matrixClient, { aliasStore, mcpDataStore, resolver, homeserverUrl: 'https://matrix.org', serverName: 'matrix.org' })
-      const sendDm = tools.find(t => t.name === 'send_dm')
+      const tools = getTools(matrixClient, {
+        aliasStore,
+        mcpDataStore,
+        resolver,
+        homeserverUrl: 'https://matrix.org',
+        serverName: 'matrix.org',
+      })
+      const sendDm = tools.find((t) => t.name === 'send_dm')
 
-      const result = await sendDm.execute({ userId: '@alice:matrix.org', message: 'Hi Alice' }, { userId: '@user:matrix.org' })
+      const result = await sendDm.execute(
+        { userId: '@alice:matrix.org', message: 'Hi Alice' },
+        { userId: '@user:matrix.org' }
+      )
       const parsed = JSON.parse(result.content[0].text)
       expect(parsed.success).toBe(true)
       expect(parsed.dmRoomId).toBe('!new:matrix.org')
@@ -143,22 +197,42 @@ describe('createMatrixMcpServer', () => {
 
     it('set_room_alias stores an alias', async () => {
       const { getTools } = await import('../../src/mcp-server.js')
-      const tools = getTools(matrixClient, { aliasStore, mcpDataStore, resolver, homeserverUrl: 'https://matrix.org', serverName: 'matrix.org' })
-      const setAlias = tools.find(t => t.name === 'set_room_alias')
+      const tools = getTools(matrixClient, {
+        aliasStore,
+        mcpDataStore,
+        resolver,
+        homeserverUrl: 'https://matrix.org',
+        serverName: 'matrix.org',
+      })
+      const setAlias = tools.find((t) => t.name === 'set_room_alias')
 
-      const result = await setAlias.execute({ alias: 'eng', roomId: '!eng:matrix.org' }, { userId: '@user:matrix.org' })
+      const result = await setAlias.execute(
+        { alias: 'eng', roomId: '!eng:matrix.org' },
+        { userId: '@user:matrix.org' }
+      )
       const parsed = JSON.parse(result.content[0].text)
       expect(parsed.success).toBe(true)
       // Verify the alias was stored
-      expect(aliasStore.getRoomAlias('!unknown:localhost', '@user:matrix.org', 'eng')).toBe('!eng:matrix.org')
+      expect(aliasStore.getRoomAlias('!unknown:localhost', '@user:matrix.org', 'eng')).toBe(
+        '!eng:matrix.org'
+      )
     })
 
     it('resolve_room resolves a room name', async () => {
       const { getTools } = await import('../../src/mcp-server.js')
-      const tools = getTools(matrixClient, { aliasStore, mcpDataStore, resolver, homeserverUrl: 'https://matrix.org', serverName: 'matrix.org' })
-      const resolveTool = tools.find(t => t.name === 'resolve_room')
+      const tools = getTools(matrixClient, {
+        aliasStore,
+        mcpDataStore,
+        resolver,
+        homeserverUrl: 'https://matrix.org',
+        serverName: 'matrix.org',
+      })
+      const resolveTool = tools.find((t) => t.name === 'resolve_room')
 
-      const result = await resolveTool.execute({ roomName: 'Engineering' }, { userId: '@user:matrix.org' })
+      const result = await resolveTool.execute(
+        { roomName: 'Engineering' },
+        { userId: '@user:matrix.org' }
+      )
       const parsed = JSON.parse(result.content[0].text)
       expect(parsed.success).toBe(true)
       expect(parsed.roomId).toBe('!room1:matrix.org')
@@ -168,13 +242,28 @@ describe('createMatrixMcpServer', () => {
     it('error handling wraps errors in MCP result format', async () => {
       const { getTools } = await import('../../src/mcp-server.js')
       const failingClient = createMockMatrixClient({
-        sendText: async () => { throw new Error('Network error') },
+        sendText: async () => {
+          throw new Error('Network error')
+        },
       })
-      const failingResolver = new MatrixIdResolver({ log: () => {}, matrixClient: failingClient, aliasStore })
-      const tools = getTools(failingClient, { aliasStore, mcpDataStore, resolver: failingResolver, homeserverUrl: 'https://matrix.org', serverName: 'matrix.org' })
-      const sendMsg = tools.find(t => t.name === 'send_message')
+      const failingResolver = new MatrixIdResolver({
+        log: () => {},
+        matrixClient: failingClient,
+        aliasStore,
+      })
+      const tools = getTools(failingClient, {
+        aliasStore,
+        mcpDataStore,
+        resolver: failingResolver,
+        homeserverUrl: 'https://matrix.org',
+        serverName: 'matrix.org',
+      })
+      const sendMsg = tools.find((t) => t.name === 'send_message')
 
-      const result = await sendMsg.execute({ roomId: '!room1:matrix.org', message: 'test' }, { userId: '@user:matrix.org' })
+      const result = await sendMsg.execute(
+        { roomId: '!room1:matrix.org', message: 'test' },
+        { userId: '@user:matrix.org' }
+      )
       expect(result.isError).toBe(true)
       const parsed = JSON.parse(result.content[0].text)
       expect(parsed.success).toBe(false)
@@ -185,14 +274,34 @@ describe('createMatrixMcpServer', () => {
   describe('cron tools removed', () => {
     it('does not include schedule_cron_task', async () => {
       const { getTools } = await import('../../src/mcp-server.js')
-      const tools = getTools(createMockMatrixClient(), { aliasStore: new AliasStore(), mcpDataStore: new McpDataStore(), resolver: new MatrixIdResolver({ log: () => {}, matrixClient: createMockMatrixClient(), aliasStore: new AliasStore() }), homeserverUrl: 'https://matrix.org', serverName: 'matrix.org' })
-      expect(tools.find(t => t.name === 'schedule_cron_task')).toBeUndefined()
+      const tools = getTools(createMockMatrixClient(), {
+        aliasStore: new AliasStore(),
+        mcpDataStore: new McpDataStore(),
+        resolver: new MatrixIdResolver({
+          log: () => {},
+          matrixClient: createMockMatrixClient(),
+          aliasStore: new AliasStore(),
+        }),
+        homeserverUrl: 'https://matrix.org',
+        serverName: 'matrix.org',
+      })
+      expect(tools.find((t) => t.name === 'schedule_cron_task')).toBeUndefined()
     })
 
     it('does not include list_cron_tasks', async () => {
       const { getTools } = await import('../../src/mcp-server.js')
-      const tools = getTools(createMockMatrixClient(), { aliasStore: new AliasStore(), mcpDataStore: new McpDataStore(), resolver: new MatrixIdResolver({ log: () => {}, matrixClient: createMockMatrixClient(), aliasStore: new AliasStore() }), homeserverUrl: 'https://matrix.org', serverName: 'matrix.org' })
-      expect(tools.find(t => t.name === 'list_cron_tasks')).toBeUndefined()
+      const tools = getTools(createMockMatrixClient(), {
+        aliasStore: new AliasStore(),
+        mcpDataStore: new McpDataStore(),
+        resolver: new MatrixIdResolver({
+          log: () => {},
+          matrixClient: createMockMatrixClient(),
+          aliasStore: new AliasStore(),
+        }),
+        homeserverUrl: 'https://matrix.org',
+        serverName: 'matrix.org',
+      })
+      expect(tools.find((t) => t.name === 'list_cron_tasks')).toBeUndefined()
     })
   })
 })

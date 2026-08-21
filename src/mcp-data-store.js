@@ -1,12 +1,12 @@
 /**
  * McpDataStore - Persistent data storage for MCP tool caches
- * 
+ *
  * Stores:
  * - DM room IDs: { targetUserId: roomId }
  * - Room aliases: { alias: roomId }
  * - User aliases: { alias: userId }
- * 
- * Persisted via DataManager (interval + exit saves)
+ *
+ * Persisted via saveJson on shutdown
  */
 
 export { McpDataStore }
@@ -21,7 +21,7 @@ class McpDataStore {
       roomAliases: {},
       userAliases: {},
       lastUpdated: null,
-      ...initialData
+      ...initialData,
     }
 
     // Deep merge for nested objects (in case partial data loaded)
@@ -37,7 +37,7 @@ class McpDataStore {
   }
 
   // ==================== DM ROOM CACHE ====================
-  
+
   /**
    * Get cached DM room ID for a user
    * @param {string} targetUserId - The user ID to look up
@@ -76,7 +76,7 @@ class McpDataStore {
   }
 
   // ==================== ROOM ALIAS CACHE ====================
-  
+
   /**
    * Get cached room ID for an alias
    * @param {string} alias - The room alias
@@ -106,7 +106,7 @@ class McpDataStore {
   }
 
   // ==================== USER ALIAS CACHE ====================
-  
+
   /**
    * Get cached user ID for an alias
    * @param {string} alias - The user alias
@@ -136,9 +136,9 @@ class McpDataStore {
   }
 
   // ==================== PERSISTENCE ====================
-  
+
   /**
-   * Serialize to JSON for DataManager
+   * Serialize to JSON for persistence
    * @returns {String}
    */
   toJSON() {
@@ -154,7 +154,7 @@ class McpDataStore {
       dmRoomsCount: Object.keys(this.#data.dmRooms).length,
       roomAliasesCount: Object.keys(this.#data.roomAliases).length,
       userAliasesCount: Object.keys(this.#data.userAliases).length,
-      lastUpdated: this.#data.lastUpdated
+      lastUpdated: this.#data.lastUpdated,
     }
   }
 }

@@ -1,7 +1,7 @@
 /**
  * Matrix MCP Server — Exposes Matrix chat operations as MCP tools.
  *
- * Creates a SimpleServer from @guan/mcp-ai that wraps Matrix SDK operations
+ * Creates a SimpleServer from @guan-tends/mcp-ai that wraps Matrix SDK operations
  * into MCP tool calls. Designed for standalone operation: the server receives
  * a pre-initialized MatrixClient and supporting stores via dependency injection.
  *
@@ -12,12 +12,9 @@
  *   ID resolution: set_room_alias, set_user_alias, resolve_room, resolve_user
  *
  * @module mcp-server
- * @author Freeman & Guan
- * @since 2026-04-20
- * @extracted 2026-08-21 — Standalone package, cron removed, fullUserId bug fixed
  */
 
-import { createSimpleServer } from '@guan/mcp-ai/simple-server/index.js'
+import { createSimpleServer } from '@guan-tends/mcp-ai/simple-server/index.js'
 import { z } from 'zod'
 
 // ──────────────────────────────────────────────────────────────────────────
@@ -60,10 +57,20 @@ function success(data) {
 
 const schemas = {
   roomId: z.string().describe('Matrix room ID (e.g., !abc123:server.com)'),
-  roomIdOrAlias: z.string().describe('Matrix room ID or alias (e.g., !abc123:server.com or #room:server.com)'),
-  roomName: z.string().optional().describe('Human-friendly room name. Resolved to room ID if roomId is not provided.'),
+  roomIdOrAlias: z
+    .string()
+    .describe('Matrix room ID or alias (e.g., !abc123:server.com or #room:server.com)'),
+  roomName: z
+    .string()
+    .optional()
+    .describe('Human-friendly room name. Resolved to room ID if roomId is not provided.'),
   userId: z.string().describe('Matrix user ID (e.g., @user:server.com)'),
-  userName: z.string().optional().describe('Human-friendly user name or display name. Resolved to user ID if userId is not provided.'),
+  userName: z
+    .string()
+    .optional()
+    .describe(
+      'Human-friendly user name or display name. Resolved to user ID if userId is not provided.'
+    ),
   message: z.string().describe('Message text content'),
   emoji: z.string().describe('Emoji reaction (e.g., 👍, ❤️)'),
   alias: z.string().describe('User-defined alias for a room or user'),
@@ -89,7 +96,9 @@ async function resolveRoomInput(roomId, roomName, requestingUserId, resolver) {
   if (roomName && resolver) {
     const result = await resolver.resolveRoom(roomName, requestingUserId)
     if (result.roomId) return result
-    throw new Error(`Could not resolve room "${roomName}": ${result.ambiguity ? 'ambiguous matches' : 'not found'}`)
+    throw new Error(
+      `Could not resolve room "${roomName}": ${result.ambiguity ? 'ambiguous matches' : 'not found'}`
+    )
   }
   throw new Error('Either roomId or roomName must be provided')
 }
@@ -109,7 +118,9 @@ async function resolveUserInput(userId, userName, requestingUserId, resolver) {
   if (userName && resolver) {
     const result = await resolver.resolveUser(userName, requestingUserId)
     if (result.userId) return result
-    throw new Error(`Could not resolve user "${userName}": ${result.ambiguity ? 'ambiguous matches' : 'not found'}`)
+    throw new Error(
+      `Could not resolve user "${userName}": ${result.ambiguity ? 'ambiguous matches' : 'not found'}`
+    )
   }
   throw new Error('Either userId or userName must be provided')
 }
@@ -131,10 +142,12 @@ async function findExistingDM(client, userId, mcpDataStore) {
     for (const roomId of joinedRooms) {
       try {
         const state = await client.getRoomState(roomId)
-        const createEvent = state.find(e => e.type === 'm.room.create')
-        const memberEvents = state.filter(e => e.type === 'm.room.member' && e.content?.membership === 'join')
+        const createEvent = state.find((e) => e.type === 'm.room.create')
+        const memberEvents = state.filter(
+          (e) => e.type === 'm.room.member' && e.content?.membership === 'join'
+        )
         if (createEvent?.content?.is_direct === true) {
-          const memberIds = memberEvents.map(e => e.state_key)
+          const memberIds = memberEvents.map((e) => e.state_key)
           const botUserId = await client.getUserId()
           if (memberIds.includes(userId) && memberIds.includes(botUserId)) {
             mcpDataStore?.setDMRoom(userId, roomId)
@@ -164,7 +177,9 @@ async function createDM(client, userId, mcpDataStore) {
     preset: 'trusted_private_chat',
     invite: [userId],
     is_direct: true,
-    initial_state: [{ type: 'm.room.encryption', state_key: '', content: { algorithm: 'm.megolm.v1.aes-sha2' } }],
+    initial_state: [
+      { type: 'm.room.encryption', state_key: '', content: { algorithm: 'm.megolm.v1.aes-sha2' } },
+    ],
   })
   const roomId = createResult?.room_id ?? createResult
   mcpDataStore?.setDMRoom(userId, roomId)
@@ -198,7 +213,8 @@ export function getTools(matrixClient, config) {
 
     {
       name: 'send_message',
-      description: 'Send a text message to a Matrix room. Accepts either roomId (exact) or roomName (resolved).',
+      description:
+        'Send a text message to a Matrix room. Accepts either roomId (exact) or roomName (resolved).',
       inputSchema: {
         roomId: schemas.roomId.optional(),
         roomName: schemas.roomName,
@@ -209,7 +225,10 @@ export function getTools(matrixClient, config) {
           const uid = context?.userId || '@agent:localhost'
           const resolution = await resolveRoomInput(roomId, roomName, uid, resolver)
           await matrixClient.sendText(resolution.roomId, message)
-          return success({ roomId: resolution.roomId, resolution: { confidence: resolution.confidence, source: resolution.source } })
+          return success({
+            roomId: resolution.roomId,
+            resolution: { confidence: resolution.confidence, source: resolution.source },
+          })
         }),
     },
 
@@ -227,7 +246,10 @@ export function getTools(matrixClient, config) {
           const uid = context?.userId || '@agent:localhost'
           const resolution = await resolveRoomInput(roomId, roomName, uid, resolver)
           await matrixClient.sendHtmlText(resolution.roomId, html, text)
-          return success({ roomId: resolution.roomId, resolution: { confidence: resolution.confidence, source: resolution.source } })
+          return success({
+            roomId: resolution.roomId,
+            resolution: { confidence: resolution.confidence, source: resolution.source },
+          })
         }),
     },
 
@@ -251,12 +273,16 @@ export function getTools(matrixClient, config) {
 
     {
       name: 'send_dm',
-      description: 'Send a direct message to a user. Creates an encrypted DM room if one does not exist.',
+      description:
+        'Send a direct message to a user. Creates an encrypted DM room if one does not exist.',
       inputSchema: {
         userId: schemas.userId.optional(),
         userName: schemas.userName,
         message: schemas.message,
-        forceNew: z.boolean().optional().describe('Create a new DM room even if a cached room exists'),
+        forceNew: z
+          .boolean()
+          .optional()
+          .describe('Create a new DM room even if a cached room exists'),
       },
       execute: async ({ userId, userName, message, forceNew }, context) =>
         withErrorHandling(async () => {
@@ -264,7 +290,9 @@ export function getTools(matrixClient, config) {
           const userResolution = await resolveUserInput(userId, userName, uid, resolver)
           const targetUserId = userResolution.userId
 
-          let dmRoomId = forceNew ? null : await findExistingDM(matrixClient, targetUserId, mcpDataStore)
+          let dmRoomId = forceNew
+            ? null
+            : await findExistingDM(matrixClient, targetUserId, mcpDataStore)
           let dmCreated = false
 
           if (!dmRoomId) {
@@ -273,7 +301,15 @@ export function getTools(matrixClient, config) {
           }
 
           await matrixClient.sendText(dmRoomId, message)
-          return success({ dmRoomId, userId: targetUserId, dmCreated, userResolution: { confidence: userResolution.confidence, source: userResolution.source } })
+          return success({
+            dmRoomId,
+            userId: targetUserId,
+            dmCreated,
+            userResolution: {
+              confidence: userResolution.confidence,
+              source: userResolution.source,
+            },
+          })
         }),
     },
 
@@ -328,7 +364,11 @@ export function getTools(matrixClient, config) {
           const uid = context?.userId || '@agent:localhost'
           const resolution = await resolveRoomInput(roomId, roomName, uid, resolver)
           const messages = await matrixClient.getRoomMessages(resolution.roomId, limit)
-          return success({ roomId: resolution.roomId, messages, resolution: { confidence: resolution.confidence, source: resolution.source } })
+          return success({
+            roomId: resolution.roomId,
+            messages,
+            resolution: { confidence: resolution.confidence, source: resolution.source },
+          })
         }),
     },
 
@@ -336,7 +376,8 @@ export function getTools(matrixClient, config) {
 
     {
       name: 'get_presence',
-      description: 'Get presence status for a user. Accepts either userId (exact) or userName (resolved).',
+      description:
+        'Get presence status for a user. Accepts either userId (exact) or userName (resolved).',
       inputSchema: {
         userId: schemas.userId.optional(),
         userName: schemas.userName,
@@ -346,7 +387,11 @@ export function getTools(matrixClient, config) {
           const uid = context?.userId || '@agent:localhost'
           const resolution = await resolveUserInput(userId, userName, uid, resolver)
           const presence = await matrixClient.getPresence(resolution.userId)
-          return success({ userId: resolution.userId, presence, resolution: { confidence: resolution.confidence, source: resolution.source } })
+          return success({
+            userId: resolution.userId,
+            presence,
+            resolution: { confidence: resolution.confidence, source: resolution.source },
+          })
         }),
     },
 
@@ -393,7 +438,8 @@ export function getTools(matrixClient, config) {
 
     {
       name: 'set_room_alias',
-      description: 'Teach the bot a user-defined alias for a room. Example: alias "eng" → "!abc123:matrix.org".',
+      description:
+        'Teach the bot a user-defined alias for a room. Example: alias "eng" → "!abc123:matrix.org".',
       inputSchema: {
         alias: schemas.alias,
         roomId: schemas.roomId,
@@ -403,13 +449,18 @@ export function getTools(matrixClient, config) {
           const uid = context?.userId || '@agent:localhost'
           const currentRoomId = context?.roomId || roomId
           aliasStore.setRoomAlias(currentRoomId, uid, alias, roomId)
-          return success({ alias, roomId, message: `Room alias "${alias}" → "${roomId}" saved for user ${uid}` })
+          return success({
+            alias,
+            roomId,
+            message: `Room alias "${alias}" → "${roomId}" saved for user ${uid}`,
+          })
         }),
     },
 
     {
       name: 'set_user_alias',
-      description: 'Teach the bot a user-defined alias for a user. Example: alias "alice" → "@alice:matrix.org".',
+      description:
+        'Teach the bot a user-defined alias for a user. Example: alias "alice" → "@alice:matrix.org".',
       inputSchema: {
         alias: schemas.alias,
         userId: schemas.userId,
@@ -419,16 +470,24 @@ export function getTools(matrixClient, config) {
           const uid = context?.userId || '@agent:localhost'
           const currentRoomId = context?.roomId || '!unknown:localhost'
           aliasStore.setUserAlias(currentRoomId, uid, alias, userId)
-          return success({ alias, userId, message: `User alias "${alias}" → "${userId}" saved for user ${uid}` })
+          return success({
+            alias,
+            userId,
+            message: `User alias "${alias}" → "${userId}" saved for user ${uid}`,
+          })
         }),
     },
 
     {
       name: 'resolve_room',
-      description: 'Resolve a room name to its Matrix ID. Returns confidence score and resolution source.',
+      description:
+        'Resolve a room name to its Matrix ID. Returns confidence score and resolution source.',
       inputSchema: {
         roomName: schemas.roomName.describe('Room name to resolve (required)'),
-        currentRoomId: z.string().optional().describe('Current room context for ambiguity resolution'),
+        currentRoomId: z
+          .string()
+          .optional()
+          .describe('Current room context for ambiguity resolution'),
       },
       execute: async ({ roomName, currentRoomId }, context) =>
         withErrorHandling(async () => {
@@ -436,28 +495,35 @@ export function getTools(matrixClient, config) {
           const uid = context?.userId || '@agent:localhost'
           const result = await resolver.resolveRoom(roomName, uid, { currentRoomId })
           return {
-            content: [{
-              type: 'text',
-              text: JSON.stringify({
-                success: !!result.roomId,
-                roomId: result.roomId || null,
-                confidence: result.confidence,
-                source: result.source,
-                name: result.name,
-                ambiguity: result.ambiguity || false,
-                candidates: result.candidates || null,
-                message: result.roomId
-                  ? `Resolved "${roomName}" → "${result.roomId}" (confidence: ${result.confidence})`
-                  : `Could not resolve "${roomName}"`,
-              }, null, 2),
-            }],
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify(
+                  {
+                    success: !!result.roomId,
+                    roomId: result.roomId || null,
+                    confidence: result.confidence,
+                    source: result.source,
+                    name: result.name,
+                    ambiguity: result.ambiguity || false,
+                    candidates: result.candidates || null,
+                    message: result.roomId
+                      ? `Resolved "${roomName}" → "${result.roomId}" (confidence: ${result.confidence})`
+                      : `Could not resolve "${roomName}"`,
+                  },
+                  null,
+                  2
+                ),
+              },
+            ],
           }
         }),
     },
 
     {
       name: 'resolve_user',
-      description: 'Resolve a user name to their Matrix ID. Returns confidence score and resolution source.',
+      description:
+        'Resolve a user name to their Matrix ID. Returns confidence score and resolution source.',
       inputSchema: {
         userName: schemas.userName.describe('User name to resolve (required)'),
       },
@@ -467,21 +533,27 @@ export function getTools(matrixClient, config) {
           const uid = context?.userId || '@agent:localhost'
           const result = await resolver.resolveUser(userName, uid)
           return {
-            content: [{
-              type: 'text',
-              text: JSON.stringify({
-                success: !!result.userId,
-                userId: result.userId || null,
-                confidence: result.confidence,
-                source: result.source,
-                name: result.name,
-                ambiguity: result.ambiguity || false,
-                candidates: result.candidates || null,
-                message: result.userId
-                  ? `Resolved "${userName}" → "${result.userId}" (confidence: ${result.confidence})`
-                  : `Could not resolve "${userName}"`,
-              }, null, 2),
-            }],
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify(
+                  {
+                    success: !!result.userId,
+                    userId: result.userId || null,
+                    confidence: result.confidence,
+                    source: result.source,
+                    name: result.name,
+                    ambiguity: result.ambiguity || false,
+                    candidates: result.candidates || null,
+                    message: result.userId
+                      ? `Resolved "${userName}" → "${result.userId}" (confidence: ${result.confidence})`
+                      : `Could not resolve "${userName}"`,
+                  },
+                  null,
+                  2
+                ),
+              },
+            ],
           }
         }),
     },
@@ -512,7 +584,7 @@ export function createMatrixMcpServer(matrixClient, config = {}) {
   const tools = getTools(matrixClient, config)
 
   const serverConfig = {
-    name: 'guan-matrix-control',
+    name: 'matrix-mcp-server',
     version: '2.0.0',
     server: {
       connection: { type: 'http', port, host },

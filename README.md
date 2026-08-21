@@ -1,61 +1,45 @@
-# @guan/matrix-mcp-server
+# @guan-tends/matrix-mcp-server
 
-Standalone Matrix MCP tool server exposing Matrix chat operations via the Model Context Protocol.
+[![npm version](https://img.shields.io/npm/v/@guan-tends/matrix-mcp-server.svg)](https://www.npmjs.com/package/@guan-tends/matrix-mcp-server)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Node.js Version](https://img.shields.io/badge/node-%3E%3D22.0.0-brightgreen.svg)](https://nodejs.org/)
 
-Designed to be wrapped by `@guan/mcp-ai`'s aggregator — any agent (Mneme, Mnemos, or any MCP client) connects through the aggregator to call Matrix operations as tools.
+A standalone MCP (Model Context Protocol) tool server that exposes [Matrix](https://matrix.org/) chat operations as callable tools. Any MCP-compatible client — AI agents, automation pipelines, developer tools — can use these tools to send messages, manage rooms, resolve names, and interact with the Matrix protocol.
 
-## Architecture
+Built on [`@vector-im/matrix-bot-sdk`](https://github.com/vector-im/matrix-bot-sdk) with full E2EE (end-to-end encryption) support.
 
-```
-                    ┌─────────────────────────┐
-                    │      index.js            │
-                    │   (composition root)     │
-                    └──────────┬──────────────┘
-                               │ wires
-              ┌────────────────┼────────────────┐
-              ▼                ▼                 ▼
-     ┌──────────────┐  ┌──────────────┐  ┌──────────────┐
-     │ MatrixClient │  │  AliasStore  │  │ McpDataStore │
-     │ (bot-sdk)    │  │ (aliases)    │  │ (DM cache)   │
-     └──────┬───────┘  └──────┬───────┘  └──────┬───────┘
-            │                 │                  │
-            └────────┬────────┘                  │
-                     ▼                           │
-            ┌──────────────────┐                 │
-            │ MatrixIdResolver  │◄────────────────┘
-            └────────┬─────────┘
-                     │
-                     ▼
-            ┌──────────────────┐
-            │   mcp-server.js   │── @guan/mcp-ai SimpleServer
-            │   (15 tools)      │── HTTP transport, port 3456
-            └──────────────────┘
+## Features
+
+- **15 MCP tools** — messaging, room management, user management, and intelligent ID resolution
+- **E2EE support** — full Megolm encryption via Rust crypto backend
+- **Human-friendly name resolution** — refer to rooms and users by name, not opaque IDs
+- **Alias system** — teach the server custom shortcuts (e.g., `"eng"` → `"!abc123:matrix.org"`)
+- **Standalone HTTP server** — runs independently, connect any MCP client via HTTP
+- **Zero-cron, zero-LLM** — pure tool server. Scheduling and intelligence live in the agent layer
+
+## Install
+
+```bash
+npm install @guan-tends/matrix-mcp-server
 ```
 
-**Composition-Root IoC**: `index.js` wires all dependencies. No module imports another's deps. Each module is independently testable. The server factory (`createMatrixMcpServer`) accepts already-constructed dependencies.
-
-## Setup
-
-### Prerequisites
+### Requirements
 
 - Node.js >= 22.0.0
 - A Matrix account with an access token
 
-### Installation
+## Quick Start
+
+### 1. Clone and configure
 
 ```bash
-git clone http://192.168.8.142:8561/guan/matrix-mcp-server.git
+git clone https://github.com/guan-tends/matrix-mcp-server.git
 cd matrix-mcp-server
 npm install
-```
-
-### Configuration
-
-Copy the example config and fill in your Matrix credentials:
-
-```bash
 cp config.example.json5 config.json5
 ```
+
+Edit `config.json5` with your Matrix credentials:
 
 ```json5
 {
@@ -64,12 +48,44 @@ cp config.example.json5 config.json5
   serverName: "matrix.org",
   port: 3456,
   host: "0.0.0.0",
-  storePath: "./data/store",
+  storePath: "./data/store.json",
   cryptoPath: "./data/crypto",
 }
 ```
 
-Environment variable overrides (highest precedence):
+### 2. Run
+
+```bash
+npm start
+```
+
+The server listens on `http://0.0.0.0:3456` and accepts MCP protocol requests over HTTP.
+
+### 3. Connect your MCP client
+
+Point any MCP-compatible client at the server:
+
+```json
+{
+  "mcpServers": {
+    "matrix": {
+      "url": "http://localhost:3456"
+    }
+  }
+}
+```
+
+Or use with [`@guan-tends/mcp-ai`](https://www.npmjs.com/package/@guan-tends/mcp-ai) aggregator for multi-server tool composition.
+
+## Configuration
+
+### File-based
+
+Edit `config.json5` (see `config.example.json5` for all options).
+
+### Environment variables
+
+All config values can be set via environment variables (highest precedence):
 
 | Variable | Config Key |
 |---|---|
@@ -80,33 +96,6 @@ Environment variable overrides (highest precedence):
 | `MATRIX_MCP_SERVER_NAME` | `serverName` |
 | `MATRIX_MCP_STORE_PATH` | `storePath` |
 | `MATRIX_MCP_CRYPTO_PATH` | `cryptoPath` |
-
-### Running
-
-```bash
-npm start
-```
-
-## Aggregator Integration
-
-In your `@guan/mcp-ai` aggregator config:
-
-```json5
-{
-  "mcps": [
-    {
-      "id": "matrix",
-      "connection": {
-        "type": "http",
-        "url": "http://localhost:3456"
-      }
-    }
-    // ... other MCP servers
-  ]
-}
-```
-
-The aggregator connects to the Matrix MCP server, discovers its 15 tools, and exposes them (with optional prefixing: `matrix_send_message`, `matrix_join_room`, etc.) to any agent.
 
 ## Tools (15)
 
@@ -140,12 +129,12 @@ The aggregator connects to the Matrix MCP server, discovers its 15 tools, and ex
 
 | Tool | Description |
 |---|---|
-| `set_room_alias` | Teach the server a room alias (e.g., "eng" → "!abc:matrix.org") |
-| `set_user_alias` | Teach the server a user alias (e.g., "alice" → "@alice:matrix.org") |
+| `set_room_alias` | Teach the server a room alias (e.g., `"eng"` → `"!abc:matrix.org"`) |
+| `set_user_alias` | Teach the server a user alias (e.g., `"alice"` → `"@alice:matrix.org"`) |
 | `resolve_room` | Resolve a room name to its Matrix ID with confidence score |
 | `resolve_user` | Resolve a user name to their Matrix ID with confidence score |
 
-### ID Resolution Strategy
+### Resolution Strategy
 
 The resolver uses a hybrid approach with confidence scoring:
 
@@ -153,6 +142,44 @@ The resolver uses a hybrid approach with confidence scoring:
 2. **Exact match** (confidence: 0.9) — Exact display name or canonical alias
 3. **Partial match** (confidence: 0.7) — Partial name match
 4. **Ambiguity** (confidence: 0.5) — Multiple matches, returns candidates
+
+## Architecture
+
+```
+                    ┌─────────────────────────┐
+                    │      index.js            │
+                    │   (composition root)     │
+                    └──────────┬──────────────┘
+                               │ wires
+              ┌────────────────┼────────────────┐
+              ▼                ▼                 ▼
+     ┌──────────────┐  ┌──────────────┐  ┌──────────────┐
+     │ MatrixClient │  │  AliasStore  │  │ McpDataStore │
+     │ (bot-sdk)    │  │ (aliases)    │  │ (DM cache)   │
+     └──────┬───────┘  └──────┬───────┘  └──────┬───────┘
+            │                 │                  │
+            └────────┬────────┘                  │
+                     ▼                           │
+            ┌──────────────────┐                 │
+            │ MatrixIdResolver  │◄────────────────┘
+            └────────┬─────────┘
+                     │
+                     ▼
+            ┌──────────────────┐
+            │   mcp-server.js   │── MCP SDK SimpleServer
+            │   (15 tools)      │── HTTP transport
+            └──────────────────┘
+```
+
+**Composition-Root IoC**: `index.js` wires all dependencies. No module imports another's deps. Each module is independently testable.
+
+### Design Decisions
+
+1. **Composition-Root IoC** — `index.js` wires all dependencies. Modules don't cross-import.
+2. **Minimal AliasStore** — Only 4 methods needed for room/user alias management.
+3. **Simple JSON persistence** — `persist.js` handles load/save. Two data files.
+4. **`withErrorHandling` wrapper** — DRYs the repeated try/catch in every tool.
+5. **No cron, no LLM, no bot** — Pure MCP tool server. Agents handle their own scheduling.
 
 ## Testing
 
@@ -167,7 +194,7 @@ npm run test:watch
 npm run test:coverage
 ```
 
-Current test suite: **65 tests across 6 files** (5 unit, 1 E2E).
+**65 tests** across 6 files (5 unit, 1 E2E).
 
 ## Project Structure
 
@@ -176,7 +203,7 @@ src/
 ├── index.js              — Composition root: config → Matrix client → wire → start
 ├── mcp-server.js          — 15 MCP tools + helpers (withErrorHandling, resolveRoomInput, etc.)
 ├── matrix-id-resolver.js  — Room/user name → Matrix ID resolution
-├── alias-store.js         — Minimal per-user alias storage (replaces 695-line Sessions)
+├── alias-store.js         — Minimal per-user alias storage
 ├── mcp-data-store.js      — DM room ID cache
 └── persist.js             — Simple JSON load/save utility
 
@@ -187,20 +214,15 @@ __tests__/
 └── vitest.config.js
 ```
 
-## Design Decisions
+## Sponsors
 
-1. **Composition-Root IoC** — `index.js` wires all dependencies. Modules don't cross-import.
-2. **Minimal AliasStore** — Replaces the 695-line `Sessions` class. Only 4 methods needed.
-3. **Simple JSON persistence** — `persist.js` (20 lines) over `DataManager` (189 lines). Two files.
-4. **`withErrorHandling` wrapper** — DRYs the repeated try/catch in every tool.
-5. **No cron, no LLM, no bot** — Pure MCP tool server. Agents handle their own scheduling.
-6. **`fullUserId` bug fix** — Latent bug in original `resolveRoomInput` (undefined variable reference).
-7. **Same SimpleServer interface** — `@guan/mcp-ai/simple-server`, HTTP transport, same as original.
+If this project is useful to you, consider supporting its development:
 
-## Extraction Origin
-
-Extracted from `guan-matrix-chat` (April–August 2026). The original `mcp-server.js` (935 lines, 19 tools) was trimmed to 534 lines, 15 tools (cron removed), with the `withErrorHandling` DRY wrapper added and the `fullUserId` latent bug fixed.
+- **[GitHub Sponsors](https://github.com/guan-tends/matrix-mcp-server#sponsors)**
+- **Solana**: `Eu8wQcW68TKMs1a6eqzZu8znzU52QLqQugAMG8uCD6y6`
+- **EVM** (Ethereum / Base / Arbitrum / Optimism / Polygon): `0x2733ff7c865C56d565a99BE1DC11B81cc76850A5`
+- **XRP Ledger**: `r4X6e7McAQj7e8vBCeued1RYu4mCJrREDG`
 
 ## License
 
-UNLICENSED — Private, internal use.
+[MIT](LICENSE) © 2026 [Guan](https://github.com/guan-tends)

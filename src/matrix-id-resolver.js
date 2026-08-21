@@ -21,7 +21,6 @@ export { MatrixIdResolver }
  * Resolves human-friendly names to Matrix IDs.
  */
 class MatrixIdResolver {
-
   #_log
   #_matrixClient
   #_aliasStore
@@ -71,14 +70,31 @@ class MatrixIdResolver {
       for (const room of rooms) {
         const roomDisplayName = (room.name || '').toLowerCase()
         const roomCanonicalAlias = (room.canonicalAlias || '').toLowerCase()
-        const roomAltAliases = (room.altAliases || []).map(a => a.toLowerCase())
+        const roomAltAliases = (room.altAliases || []).map((a) => a.toLowerCase())
 
-        if (roomDisplayName === normalizedName ||
-            roomCanonicalAlias === normalizedName ||
-            roomAltAliases.includes(normalizedName)) {
-          candidates.push({ roomId: room.id, name: room.name || room.canonicalAlias || room.id, memberCount: room.memberCount || 0, matchType: 'exact', confidence: 0.9 })
-        } else if (roomDisplayName.includes(normalizedName) || normalizedName.includes(roomDisplayName)) {
-          candidates.push({ roomId: room.id, name: room.name || room.canonicalAlias || room.id, memberCount: room.memberCount || 0, matchType: 'partial', confidence: 0.7 })
+        if (
+          roomDisplayName === normalizedName ||
+          roomCanonicalAlias === normalizedName ||
+          roomAltAliases.includes(normalizedName)
+        ) {
+          candidates.push({
+            roomId: room.id,
+            name: room.name || room.canonicalAlias || room.id,
+            memberCount: room.memberCount || 0,
+            matchType: 'exact',
+            confidence: 0.9,
+          })
+        } else if (
+          roomDisplayName.includes(normalizedName) ||
+          normalizedName.includes(roomDisplayName)
+        ) {
+          candidates.push({
+            roomId: room.id,
+            name: room.name || room.canonicalAlias || room.id,
+            memberCount: room.memberCount || 0,
+            matchType: 'partial',
+            confidence: 0.7,
+          })
         }
       }
 
@@ -92,7 +108,7 @@ class MatrixIdResolver {
       }
 
       // Multiple matches — prefer exact
-      const exactMatches = candidates.filter(c => c.matchType === 'exact')
+      const exactMatches = candidates.filter((c) => c.matchType === 'exact')
       if (exactMatches.length === 1) {
         const c = exactMatches[0]
         return { roomId: c.roomId, confidence: c.confidence, source: c.matchType, name: c.name }
@@ -101,12 +117,23 @@ class MatrixIdResolver {
       return {
         ambiguity: true,
         message: `Multiple rooms match "${roomName}":`,
-        candidates: candidates.map((c, i) => ({ index: i + 1, roomId: c.roomId, name: c.name, memberCount: c.memberCount, confidence: c.confidence })),
+        candidates: candidates.map((c, i) => ({
+          index: i + 1,
+          roomId: c.roomId,
+          name: c.name,
+          memberCount: c.memberCount,
+          confidence: c.confidence,
+        })),
         confidence: 0.5,
         instruction: 'Reply with the number (1, 2, etc.) or "none"',
       }
     } catch (error) {
-      this.#_log('error', '[MatrixIdResolver]', `Error resolving room "${roomName}":`, error.message)
+      this.#_log(
+        'error',
+        '[MatrixIdResolver]',
+        `Error resolving room "${roomName}":`,
+        error.message
+      )
       return { error: `Failed to resolve room: ${error.message}`, confidence: 0, source: 'error' }
     }
   }
@@ -125,14 +152,20 @@ class MatrixIdResolver {
       for (const roomId of roomIds) {
         try {
           const stateEvents = await this.#_matrixClient.getRoomState(roomId)
-          const nameEvent = stateEvents.find(e => e.type === 'm.room.name')
+          const nameEvent = stateEvents.find((e) => e.type === 'm.room.name')
           const name = nameEvent?.content?.name
-          const canonicalAliasEvent = stateEvents.find(e => e.type === 'm.room.canonical_alias')
+          const canonicalAliasEvent = stateEvents.find((e) => e.type === 'm.room.canonical_alias')
           const canonicalAlias = canonicalAliasEvent?.content?.alias
-          const aliasesEvent = stateEvents.find(e => e.type === 'm.room.aliases')
+          const aliasesEvent = stateEvents.find((e) => e.type === 'm.room.aliases')
           const altAliases = aliasesEvent?.content?.aliases || []
-          const memberEvents = stateEvents.filter(e => e.type === 'm.room.member')
-          rooms.push({ id: roomId, name, canonicalAlias, altAliases, memberCount: memberEvents.length })
+          const memberEvents = stateEvents.filter((e) => e.type === 'm.room.member')
+          rooms.push({
+            id: roomId,
+            name,
+            canonicalAlias,
+            altAliases,
+            memberCount: memberEvents.length,
+          })
         } catch {
           // Skip inaccessible rooms
         }
@@ -191,11 +224,29 @@ class MatrixIdResolver {
             const localpart = userIdLower.split(':')[0].replace('@', '')
 
             if (displayName === searchName) {
-              candidates.push({ userId: member.userId, displayName: profile?.displayname || member.userId, roomId, matchType: 'exact_display', confidence: 0.9 })
+              candidates.push({
+                userId: member.userId,
+                displayName: profile?.displayname || member.userId,
+                roomId,
+                matchType: 'exact_display',
+                confidence: 0.9,
+              })
             } else if (localpart === searchName || userIdLower === searchName) {
-              candidates.push({ userId: member.userId, displayName: profile?.displayname || member.userId, roomId, matchType: 'username', confidence: 0.8 })
+              candidates.push({
+                userId: member.userId,
+                displayName: profile?.displayname || member.userId,
+                roomId,
+                matchType: 'username',
+                confidence: 0.8,
+              })
             } else if (displayName.includes(searchName) || searchName.includes(displayName)) {
-              candidates.push({ userId: member.userId, displayName: profile?.displayname || member.userId, roomId, matchType: 'partial', confidence: 0.7 })
+              candidates.push({
+                userId: member.userId,
+                displayName: profile?.displayname || member.userId,
+                roomId,
+                matchType: 'partial',
+                confidence: 0.7,
+              })
             }
           }
         } catch {
@@ -207,7 +258,10 @@ class MatrixIdResolver {
       const unique = []
       const seen = new Set()
       for (const c of candidates) {
-        if (!seen.has(c.userId)) { seen.add(c.userId); unique.push(c) }
+        if (!seen.has(c.userId)) {
+          seen.add(c.userId)
+          unique.push(c)
+        }
       }
 
       if (unique.length === 0) {
@@ -216,24 +270,44 @@ class MatrixIdResolver {
 
       if (unique.length === 1) {
         const c = unique[0]
-        return { userId: c.userId, confidence: c.confidence, source: c.matchType, displayName: c.displayName }
+        return {
+          userId: c.userId,
+          confidence: c.confidence,
+          source: c.matchType,
+          displayName: c.displayName,
+        }
       }
 
-      const exactMatches = unique.filter(c => c.matchType === 'exact_display')
+      const exactMatches = unique.filter((c) => c.matchType === 'exact_display')
       if (exactMatches.length === 1) {
         const c = exactMatches[0]
-        return { userId: c.userId, confidence: c.confidence, source: c.matchType, displayName: c.displayName }
+        return {
+          userId: c.userId,
+          confidence: c.confidence,
+          source: c.matchType,
+          displayName: c.displayName,
+        }
       }
 
       return {
         ambiguity: true,
         message: `Multiple users match "${userName}":`,
-        candidates: unique.map((c, i) => ({ index: i + 1, userId: c.userId, displayName: c.displayName, confidence: c.confidence })),
+        candidates: unique.map((c, i) => ({
+          index: i + 1,
+          userId: c.userId,
+          displayName: c.displayName,
+          confidence: c.confidence,
+        })),
         confidence: 0.5,
         instruction: 'Reply with the number (1, 2, etc.) or "none"',
       }
     } catch (error) {
-      this.#_log('error', '[MatrixIdResolver]', `Error resolving user "${userName}":`, error.message)
+      this.#_log(
+        'error',
+        '[MatrixIdResolver]',
+        `Error resolving user "${userName}":`,
+        error.message
+      )
       return { error: `Failed to resolve user: ${error.message}`, confidence: 0, source: 'error' }
     }
   }
@@ -256,9 +330,13 @@ class MatrixIdResolver {
         try {
           const members = await this.#_matrixClient.getRoomMembers(roomId)
           if (members.length === 2) {
-            const memberIds = members.map(m => m.userId)
+            const memberIds = members.map((m) => m.userId)
             if (memberIds.includes(userId)) {
-              this.#_log('debug', '[MatrixIdResolver]', `Found existing DM with ${userId}: ${roomId}`)
+              this.#_log(
+                'debug',
+                '[MatrixIdResolver]',
+                `Found existing DM with ${userId}: ${roomId}`
+              )
               return roomId
             }
           }
@@ -286,13 +364,24 @@ class MatrixIdResolver {
         invite: [userId],
         preset: 'trusted_private_chat',
         visibility: 'private',
-        initial_state: [{ type: 'm.room.encryption', state_key: '', content: { algorithm: 'm.megolm.v1.aes-sha2' } }],
+        initial_state: [
+          {
+            type: 'm.room.encryption',
+            state_key: '',
+            content: { algorithm: 'm.megolm.v1.aes-sha2' },
+          },
+        ],
       })
       const roomId = createResult?.room_id ?? createResult
       this.#_log('info', '[MatrixIdResolver]', `Created DM room with ${userId}: ${roomId}`)
       return roomId
     } catch (error) {
-      this.#_log('error', '[MatrixIdResolver]', `Failed to create DM with ${userId}:`, error.message)
+      this.#_log(
+        'error',
+        '[MatrixIdResolver]',
+        `Failed to create DM with ${userId}:`,
+        error.message
+      )
       throw error
     }
   }

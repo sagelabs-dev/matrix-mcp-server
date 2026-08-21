@@ -40,7 +40,7 @@ describe('E2E: Matrix MCP Server', () => {
     await server.start()
 
     // Wait for server to be ready
-    await new Promise(resolve => setTimeout(resolve, 500))
+    await new Promise((resolve) => setTimeout(resolve, 500))
 
     // Connect MCP client
     client = new Client({ name: 'test-client', version: '1.0.0' })
@@ -57,7 +57,7 @@ describe('E2E: Matrix MCP Server', () => {
     const { tools } = await client.listTools()
     expect(tools).toHaveLength(15)
 
-    const toolNames = tools.map(t => t.name).sort()
+    const toolNames = tools.map((t) => t.name).sort()
     expect(toolNames).toContain('send_message')
     expect(toolNames).toContain('send_html_message')
     expect(toolNames).toContain('send_reaction')

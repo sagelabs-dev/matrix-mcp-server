@@ -1,7 +1,7 @@
 /**
  * AliasStore — Minimal per-user alias storage for Matrix room/user ID resolution.
  *
- * Replaces the 695-line Sessions class from guan-matrix-chat. The MCP server only
+ * Minimal alias storage for Matrix room/user ID resolution. The MCP server only
  * needs four methods: getRoomAlias, setRoomAlias, getUserAlias, setUserAlias.
  *
  * Aliases are stored per-user (keyed by uid). The rid parameter is accepted for
@@ -15,7 +15,6 @@
  * @class AliasStore
  */
 export class AliasStore {
-
   /** @type {{ rooms: Object<string, Object<string, string>>, users: Object<string, Object<string, string>> }} */
   #data
 

@@ -79,7 +79,9 @@ describe('AliasStore', () => {
 
       const restored = new AliasStore(JSON.parse(json))
       expect(restored.getRoomAlias('!room1:server', '@user:server', 'eng')).toBe('!eng:server')
-      expect(restored.getUserAlias('!room1:server', '@user:server', 'alice')).toBe('@alice:matrix.org')
+      expect(restored.getUserAlias('!room1:server', '@user:server', 'alice')).toBe(
+        '@alice:matrix.org'
+      )
     })
 
     it('empty store serializes and restores correctly', () => {

@@ -1,7 +1,7 @@
 {
-  "name": "@guan/matrix-mcp-server",
+  "name": "@guan-tends/matrix-mcp-server",
   "version": "1.0.0",
-  "description": "Standalone Matrix MCP tool server exposing Matrix chat operations via MCP protocol",
+  "description": "Standalone Matrix MCP tool server exposing Matrix chat operations via the Model Context Protocol",
   "type": "module",
   "main": "src/index.js",
   "exports": {
@@ -15,20 +15,56 @@
     "start": "node src/index.js",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "lint": "eslint src/ __tests__/",
+    "lint:fix": "eslint src/ __tests__/ --fix",
+    "format": "prettier --write src/ __tests__/",
+    "format:check": "prettier --check src/ __tests__/",
+    "prepublishOnly": "npm run lint && npm test"
   },
+  "keywords": [
+    "matrix",
+    "mcp",
+    "model-context-protocol",
+    "chat",
+    "bot",
+    "ai",
+    "agent",
+    "tools",
+    "matrix-org",
+    "e2ee"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/guan-tends/matrix-mcp-server.git"
+  },
+  "bugs": {
+    "url": "https://github.com/guan-tends/matrix-mcp-server/issues"
+  },
+  "homepage": "https://github.com/guan-tends/matrix-mcp-server#readme",
+  "files": [
+    "src/",
+    "config.example.json5",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
   "dependencies": {
-    "@guan/mcp-ai": "file:/home/guan/src/mcp-ai/dist",
+    "@guan-tends/mcp-ai": "^1.6.5-guan.0",
     "@vector-im/matrix-bot-sdk": "^0.8.0-element.3",
     "json5": "^2.2.3",
     "zod": "^3.24.0",
     "@modelcontextprotocol/sdk": "^1.11.0"
   },
   "devDependencies": {
-    "vitest": "^4.1.5"
+    "vitest": "^4.1.5",
+    "eslint": "^9.0.0",
+    "@eslint/js": "^9.0.0",
+    "prettier": "^3.0.0"
   },
   "author": {
-    "name": "Guan & Freeman"
+    "name": "Guan",
+    "url": "https://github.com/guan-tends"
   },
-  "license": "UNLICENSED"
+  "license": "MIT"
 }

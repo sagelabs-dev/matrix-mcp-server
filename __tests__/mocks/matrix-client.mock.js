@@ -46,9 +46,21 @@ export function createMockMatrixClient(overrides = {}) {
         })
       }
       // Members
-      state.push({ type: 'm.room.member', state_key: '@bot:matrix.org', content: { membership: 'join' } })
-      state.push({ type: 'm.room.member', state_key: '@alice:matrix.org', content: { membership: 'join' } })
-      state.push({ type: 'm.room.member', state_key: '@bob:matrix.org', content: { membership: 'join' } })
+      state.push({
+        type: 'm.room.member',
+        state_key: '@bot:matrix.org',
+        content: { membership: 'join' },
+      })
+      state.push({
+        type: 'm.room.member',
+        state_key: '@alice:matrix.org',
+        content: { membership: 'join' },
+      })
+      state.push({
+        type: 'm.room.member',
+        state_key: '@bob:matrix.org',
+        content: { membership: 'join' },
+      })
       return state
     },
 
@@ -77,7 +89,8 @@ export function createMockMatrixClient(overrides = {}) {
 
     // Messaging
     sendText: async (roomId, text) => '$event:text:' + roomId + ':' + text.slice(0, 20),
-    sendHtmlText: async (roomId, html, text) => '$event:html:' + roomId + ':' + (html || text || '').slice(0, 20),
+    sendHtmlText: async (roomId, html, text) =>
+      '$event:html:' + roomId + ':' + (html || text || '').slice(0, 20),
     sendReaction: async (roomId, eventId, emoji) => '$event:reaction:' + roomId,
     sendNotice: async (roomId, text) => '$event:notice:' + roomId,
 

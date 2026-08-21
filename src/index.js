@@ -15,10 +15,13 @@
  * @module index
  */
 
-import { MatrixClient, RustSdkCryptoStorageProvider, SimpleFsStorageProvider } from '@vector-im/matrix-bot-sdk'
+import {
+  MatrixClient,
+  RustSdkCryptoStorageProvider,
+  SimpleFsStorageProvider,
+} from '@vector-im/matrix-bot-sdk'
 import JSON5 from 'json5'
 import { readFile } from 'fs/promises'
-import path from 'path'
 
 import { createMatrixMcpServer } from './mcp-server.js'
 import { MatrixIdResolver } from './matrix-id-resolver.js'
@@ -77,7 +80,8 @@ async function loadConfig() {
 
   for (const [envKey, configKey] of Object.entries(envMap)) {
     if (process.env[envKey] !== undefined) {
-      const value = envKey === 'MATRIX_MCP_PORT' ? parseInt(process.env[envKey], 10) : process.env[envKey]
+      const value =
+        envKey === 'MATRIX_MCP_PORT' ? parseInt(process.env[envKey], 10) : process.env[envKey]
       config[configKey] = value
     }
   }
@@ -99,18 +103,27 @@ async function main() {
 
   // Validate required config
   if (!config.homeserverUrl) {
-    console.error('[MatrixMCP] FATAL: homeserverUrl is required (config file or MATRIX_MCP_HOMESERVER_URL)')
+    console.error(
+      '[MatrixMCP] FATAL: homeserverUrl is required (config file or MATRIX_MCP_HOMESERVER_URL)'
+    )
     process.exit(1)
   }
   if (!config.accessToken) {
-    console.error('[MatrixMCP] FATAL: accessToken is required (config file or MATRIX_MCP_ACCESS_TOKEN)')
+    console.error(
+      '[MatrixMCP] FATAL: accessToken is required (config file or MATRIX_MCP_ACCESS_TOKEN)'
+    )
     process.exit(1)
   }
 
   // ── Initialize Matrix Client with E2EE ──
   const storage = new SimpleFsStorageProvider(config.storePath)
   const cryptoProvider = new RustSdkCryptoStorageProvider(config.cryptoPath)
-  const matrixClient = new MatrixClient(config.homeserverUrl, config.accessToken, storage, cryptoProvider)
+  const matrixClient = new MatrixClient(
+    config.homeserverUrl,
+    config.accessToken,
+    storage,
+    cryptoProvider
+  )
   console.info('[MatrixMCP] Matrix client initialized')
 
   // ── Start Matrix sync (required for E2EE crypto initialization) ──
@@ -174,7 +187,7 @@ async function main() {
   process.on('SIGTERM', shutdown)
 }
 
-main().catch(error => {
+main().catch((error) => {
   console.error('[MatrixMCP] Fatal error:', error)
   process.exit(1)
 })

@@ -64,8 +64,8 @@ describe('persist', () => {
     it('save then load preserves data', async () => {
       const filePath = path.join(tmpDir, 'round-trip.json')
       const original = {
-        rooms: { 'eng': '!abc:matrix.org' },
-        users: { 'alice': '@alice:matrix.org' },
+        rooms: { eng: '!abc:matrix.org' },
+        users: { alice: '@alice:matrix.org' },
         nested: { deep: { value: true } },
       }
       await saveJson(filePath, original)

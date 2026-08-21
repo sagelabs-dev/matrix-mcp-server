@@ -15,7 +15,9 @@ describe('MatrixIdResolver', () => {
   describe('resolveRoom', () => {
     it('returns user alias with confidence 1.0 when alias is set', async () => {
       aliasStore.setRoomAlias('!current:matrix.org', '@user:matrix.org', 'eng', '!eng:matrix.org')
-      const result = await resolver.resolveRoom('eng', '@user:matrix.org', { currentRoomId: '!current:matrix.org' })
+      const result = await resolver.resolveRoom('eng', '@user:matrix.org', {
+        currentRoomId: '!current:matrix.org',
+      })
       expect(result.roomId).toBe('!eng:matrix.org')
       expect(result.confidence).toBe(1.0)
       expect(result.source).toBe('user_alias')
@@ -50,8 +52,15 @@ describe('MatrixIdResolver', () => {
 
   describe('resolveUser', () => {
     it('returns user alias with confidence 1.0 when alias is set', async () => {
-      aliasStore.setUserAlias('!current:matrix.org', '@user:matrix.org', 'alice', '@alice:matrix.org')
-      const result = await resolver.resolveUser('alice', '@user:matrix.org', { currentRoomId: '!current:matrix.org' })
+      aliasStore.setUserAlias(
+        '!current:matrix.org',
+        '@user:matrix.org',
+        'alice',
+        '@alice:matrix.org'
+      )
+      const result = await resolver.resolveUser('alice', '@user:matrix.org', {
+        currentRoomId: '!current:matrix.org',
+      })
       expect(result.userId).toBe('@alice:matrix.org')
       expect(result.confidence).toBe(1.0)
       expect(result.source).toBe('user_alias')

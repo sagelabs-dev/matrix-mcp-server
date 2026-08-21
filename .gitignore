@@ -137,3 +137,13 @@ dist
 .pnp.*
 
 config.json5
+
+# Runtime data (crypto keys, sync tokens, aliases, DM cache)
+data/
+
+# Serena project config
+.serena/
+
+# OS files
+.DS_Store
+Thumbs.db

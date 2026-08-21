@@ -4,8 +4,8 @@
   homeserverUrl: "https://matrix.org",
 
   // Bot access token (required)
-  // Obtain via the script/get-access-token.js helper in guan-matrix-chat,
-  // or from your homeserver's admin interface.
+  // Obtain from your homeserver's admin interface
+  // (e.g., Element: Settings → Help & About → Access Token)
   accessToken: "syt_XXXXXXXXXXXXXXXXXXXXXXXX",
 
   // Matrix server name for constructing user IDs
