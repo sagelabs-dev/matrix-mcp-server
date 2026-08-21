@@ -1,0 +1,30 @@
+{
+  // Matrix homeserver URL (required)
+  // Get this from your Matrix server's admin panel.
+  homeserverUrl: "https://matrix.org",
+
+  // Bot access token (required)
+  // Obtain via the script/get-access-token.js helper in guan-matrix-chat,
+  // or from your homeserver's admin interface.
+  accessToken: "syt_XXXXXXXXXXXXXXXXXXXXXXXX",
+
+  // Matrix server name for constructing user IDs
+  // If not set, derived from homeserverUrl hostname.
+  // e.g., "matrix.org" → @username:matrix.org
+  serverName: "matrix.org",
+
+  // MCP server bind configuration
+  port: 3456,
+  host: "0.0.0.0",
+
+  // Matrix SDK storage paths (E2EE crypto + session state)
+  storePath: "./data/store",
+  cryptoPath: "./data/crypto",
+
+  // Persistence paths for alias and DM cache
+  aliasPath: "./data/aliases.json",
+  dmCachePath: "./data/dm-cache.json",
+
+  // Admin Matrix user IDs (for privileged operations)
+  superIds: [],
+}
