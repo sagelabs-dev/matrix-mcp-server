@@ -1,0 +1,33 @@
+{
+  "name": "@guan/matrix-mcp-server",
+  "version": "1.0.0",
+  "description": "Standalone Matrix MCP tool server exposing Matrix chat operations via MCP protocol",
+  "type": "module",
+  "main": "src/index.js",
+  "exports": {
+    ".": "./src/index.js",
+    "./mcp-server.js": "./src/mcp-server.js"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
+  },
+  "dependencies": {
+    "@guan/mcp-ai": "file:/home/guan/src/mcp-ai/dist",
+    "@vector-im/matrix-bot-sdk": "^0.8.0-element.3",
+    "json5": "^2.2.3",
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "vitest": "^4.1.5"
+  },
+  "author": {
+    "name": "Guan & Freeman"
+  },
+  "license": "UNLICENSED"
+}
