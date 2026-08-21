@@ -1,6 +1,6 @@
 {
   "name": "@guan-tends/matrix-mcp-server",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Standalone Matrix MCP tool server exposing Matrix chat operations via the Model Context Protocol",
   "type": "module",
   "main": "src/index.js",
