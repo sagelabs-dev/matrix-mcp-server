@@ -113,6 +113,10 @@ async function main() {
   const matrixClient = new MatrixClient(config.homeserverUrl, config.accessToken, storage, cryptoProvider)
   console.info('[MatrixMCP] Matrix client initialized')
 
+  // ── Start Matrix sync (required for E2EE crypto initialization) ──
+  await matrixClient.start()
+  console.info('[MatrixMCP] Matrix sync started (E2EE crypto initialized)')
+
   // ── Load persisted state ──
   const aliasData = await loadJson(config.aliasPath)
   const dmCacheData = await loadJson(config.dmCachePath)
@@ -158,6 +162,10 @@ async function main() {
     // Stop server
     await server.stop()
     console.info('[MatrixMCP] Server stopped')
+
+    // Stop Matrix sync
+    await matrixClient.stop()
+    console.info('[MatrixMCP] Matrix sync stopped')
 
     process.exit(0)
   }
