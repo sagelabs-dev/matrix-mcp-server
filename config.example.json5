@@ -18,7 +18,7 @@
   host: "0.0.0.0",
 
   // Matrix SDK storage paths (E2EE crypto + session state)
-  storePath: "./data/store",
+  storePath: "./data/store.json",
   cryptoPath: "./data/crypto",
 
   // Persistence paths for alias and DM cache
