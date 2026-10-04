@@ -226,3 +226,7 @@ If this project is useful to you, consider supporting its development:
 ## License
 
 [MIT](LICENSE) © 2026 [Guan](https://github.com/guan-tends)
+
+---
+
+Crafted with ❤️ by [Sage Labs](https://sagelabs.dev)
