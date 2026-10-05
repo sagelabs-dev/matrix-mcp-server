@@ -42,7 +42,7 @@ chore: bump dependencies
 
 ## Reporting Issues
 
-- Use [GitHub Issues](https://github.com/guan-tends/matrix-mcp-server/issues)
+- Use [GitHub Issues](https://github.com/sagelabs-dev/matrix-mcp-server/issues)
 - Include Node.js version, OS, and steps to reproduce
 - For security issues, do NOT open a public issue — contact the maintainer directly
 

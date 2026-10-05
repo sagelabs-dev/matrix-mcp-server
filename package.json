@@ -38,12 +38,12 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/guan-tends/matrix-mcp-server.git"
+    "url": "git+https://github.com/sagelabs-dev/matrix-mcp-server.git"
   },
   "bugs": {
-    "url": "https://github.com/guan-tends/matrix-mcp-server/issues"
+    "url": "https://github.com/sagelabs-dev/matrix-mcp-server/issues"
   },
-  "homepage": "https://github.com/guan-tends/matrix-mcp-server#readme",
+  "homepage": "https://github.com/sagelabs-dev/matrix-mcp-server#readme",
   "files": [
     "src/",
     "config.example.json5",
@@ -66,7 +66,7 @@
   },
   "author": {
     "name": "Guan",
-    "url": "https://github.com/guan-tends"
+    "url": "https://github.com/sagelabs-dev"
   },
   "license": "MIT"
 }

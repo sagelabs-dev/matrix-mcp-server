@@ -33,7 +33,7 @@ npm install @guan-tends/matrix-mcp-server
 ### 1. Clone and configure
 
 ```bash
-git clone https://github.com/guan-tends/matrix-mcp-server.git
+git clone https://github.com/sagelabs-dev/matrix-mcp-server.git
 cd matrix-mcp-server
 npm install
 cp config.example.json5 config.json5
@@ -218,14 +218,14 @@ __tests__/
 
 If this project is useful to you, consider supporting its development:
 
-- **[GitHub Sponsors](https://github.com/guan-tends/matrix-mcp-server#sponsors)**
+- **[GitHub Sponsors](https://github.com/sagelabs-dev/matrix-mcp-server#sponsors)**
 - **Solana**: `Eu8wQcW68TKMs1a6eqzZu8znzU52QLqQugAMG8uCD6y6`
 - **EVM** (Ethereum / Base / Arbitrum / Optimism / Polygon): `0x2733ff7c865C56d565a99BE1DC11B81cc76850A5`
 - **XRP Ledger**: `r4X6e7McAQj7e8vBCeued1RYu4mCJrREDG`
 
 ## License
 
-[MIT](LICENSE) © 2026 [Guan](https://github.com/guan-tends)
+[MIT](LICENSE) © 2026 [Guan](https://github.com/sagelabs-dev)
 
 ---
 
