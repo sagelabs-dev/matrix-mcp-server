@@ -52,11 +52,11 @@
     "CHANGELOG.md"
   ],
   "dependencies": {
-    "@guan-tends/mcp-ai": "^1.6.5-guan.0",
     "@vector-im/matrix-bot-sdk": "^0.8.0-element.3",
     "json5": "^2.2.3",
     "zod": "^3.24.0",
-    "@modelcontextprotocol/sdk": "^1.11.0"
+    "@modelcontextprotocol/sdk": "^1.11.0",
+    "@sagelabs/mcp-ai": "^1.6.9-guan.0"
   },
   "devDependencies": {
     "vitest": "^4.1.5",
