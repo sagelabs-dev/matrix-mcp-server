@@ -1,7 +1,7 @@
 /**
  * Matrix MCP Server — Exposes Matrix chat operations as MCP tools.
  *
- * Creates a SimpleServer from @guan-tends/mcp-ai that wraps Matrix SDK operations
+ * Creates a SimpleServer from @sagelabs/mcp-ai that wraps Matrix SDK operations
  * into MCP tool calls. Designed for standalone operation: the server receives
  * a pre-initialized MatrixClient and supporting stores via dependency injection.
  *
@@ -14,7 +14,7 @@
  * @module mcp-server
  */
 
-import { createSimpleServer } from '@guan-tends/mcp-ai/simple-server/index.js'
+import { createSimpleServer } from '@sagelabs/mcp-ai/simple-server/index.js'
 import { z } from 'zod'
 
 // ──────────────────────────────────────────────────────────────────────────

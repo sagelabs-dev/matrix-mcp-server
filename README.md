@@ -1,6 +1,6 @@
-# @guan-tends/matrix-mcp-server
+# @sagelabs/matrix-mcp-server
 
-[![npm version](https://img.shields.io/npm/v/@guan-tends/matrix-mcp-server.svg)](https://www.npmjs.com/package/@guan-tends/matrix-mcp-server)
+[![npm version](https://img.shields.io/npm/v/@sagelabs/matrix-mcp-server.svg)](https://www.npmjs.com/package/@sagelabs/matrix-mcp-server)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js Version](https://img.shields.io/badge/node-%3E%3D22.0.0-brightgreen.svg)](https://nodejs.org/)
 
@@ -20,7 +20,7 @@ Built on [`@vector-im/matrix-bot-sdk`](https://github.com/vector-im/matrix-bot-s
 ## Install
 
 ```bash
-npm install @guan-tends/matrix-mcp-server
+npm install @sagelabs/matrix-mcp-server
 ```
 
 ### Requirements
@@ -75,7 +75,7 @@ Point any MCP-compatible client at the server:
 }
 ```
 
-Or use with [`@guan-tends/mcp-ai`](https://www.npmjs.com/package/@guan-tends/mcp-ai) aggregator for multi-server tool composition.
+Or use with [`@sagelabs/mcp-ai`](https://www.npmjs.com/package/@sagelabs/mcp-ai) aggregator for multi-server tool composition.
 
 ## Configuration
 
